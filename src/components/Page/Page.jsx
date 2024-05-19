@@ -47,14 +47,14 @@ const layoutStyle = {
   overflow: 'hidden',
   width: 960,
   maxWidth: 960,
-  height: 1350,
-  maxHeight: 1350,
+  // height: 1350,
+  // maxHeight: 1350,
   marginTop: 0
 };
 const flexStyle={
   width: 960,
-  height: 1350,
-  maxHeight: 1350,
+  // height: 1350,
+  // maxHeight: 1350,
   backgroundColor: '#F3F7FA'
 
 }
