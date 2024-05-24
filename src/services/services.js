@@ -6,8 +6,14 @@ export const getSearchId = async()=>{
 };
 
 export const getTickets = async (id) =>{
+    try{
     const ticketResult = await fetch(`https://aviasales-test-api.kata.academy/tickets?searchId=${id}`);
     const dataTickets = await ticketResult.json()
+    
     console.log (dataTickets);
     return dataTickets;
+    }catch(error){
+return null
+   }
+   
 }

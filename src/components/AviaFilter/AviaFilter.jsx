@@ -4,6 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ticketSlice } from '../../store/reducers/ticketReducer';
 import { stopsCountSelector } from '../../store/reducers/ticketReducer';
 
+
+// `const stopsCount = useSelector(stopsCountSelector);` - это хук, 
+// который используется для получения определенной части состояния из Redux store. 
+// В данном случае, мы используем селектор `stopsCountSelector`, 
+// чтобы получить значение `stopsCount` из состояния Redux.
 const Filter = () => {
   const dispatch = useDispatch();
  
@@ -34,17 +39,7 @@ const Filter = () => {
       <br/>
       </div> 
 
-    // <div>
-    // <input type="checkbox" onClick={onFilterClick} />
-    // <br></br>
-    // <input type="checkbox" onClick={onFilterClick} />
-    // <br />
-    // <input type="checkbox" onClick={onFilterClick} />
-    // <br />
-    // <input type="checkbox" onClick={onFilterClick} />
-    // <br />
-    // <input type="checkbox" onClick={onFilterClick} />
-    // </div>
+
   )
 }
 

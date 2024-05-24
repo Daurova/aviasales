@@ -3,7 +3,7 @@ import {Card, Col, Row, Space} from 'antd'
 
 const AviaCard = ({ ticket }) => {
   return (
-    <div>
+    <div>AviaCard
    <Space direction="vertical" size={16}>
     
     <Card
@@ -15,6 +15,10 @@ const AviaCard = ({ ticket }) => {
       }}
     >
       {ticket.price}
+
+      <ul>{ticket.segments?.map(({ date, duration }) => 
+        <li key={date}>{duration}</li>
+      )}</ul>
     </Card>
 
   </Space>
