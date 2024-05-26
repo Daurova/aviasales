@@ -11,9 +11,9 @@ export const getTickets = async (id) =>{
     const dataTickets = await ticketResult.json()
     
     console.log (dataTickets);
-    return dataTickets;
+        return dataTickets;
     }catch(error){
-return null
+        return null
    }
    
 }

@@ -1,6 +1,22 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import { getTickets, getSearchId } from '../../services/services'
 
+// Utils
+
+export const getPagination = (list, limit) => {
+    const totalCount = list.length
+    const totalPages = Math.ceil(totalCount / limit)
+
+    return {
+        page: 1,
+        limit,
+        totalPages,
+        totalCount,
+    }
+}
+
+const initialPaginationState = getPagination([], 5)
+
 //Этот код представляет начальное состояние (initial state)
 //  для хранилища данных в Redux. В данном случае, 
 //  определены ключи `tickets`, `isLoading`, `error` и `stopsCount`, 
@@ -8,11 +24,14 @@ import { getTickets, getSearchId } from '../../services/services'
 //  состоянии загрузки, ошибке и количестве остановок соответственно.
 const initialState={
     tickets: [],
-    isLoading: false,
+    isLoading: true,
+    isLoadingMore: true,
     error: '',
     stopsCount: [],
 
     sortedByPrice: "a",
+
+    pagination: initialPaginationState
 }
 
 // Slice в Redux Toolkit - это концепция, которая объединяет
@@ -48,14 +67,24 @@ export const ticketSlice = createSlice({
         },
         resetStops: (state) => {
             state.stopsCount = []
+            state.pagination.page = 1
         }, 
         
         toggleSortedByPrice: (state, action) => {
             state.sortedByPrice = action.payload
+            state.pagination.page = 1
         },
         setError: (state, action) => {
             state.error = action.payload;
         },
+        setNextPage: (state) => {
+            state.pagination.page = state.pagination.page + 1
+        },
+
+        setTickets: (state, action) => {
+            state.tickets = state.tickets.concat(action.payload)
+            state.isLoading = false
+        }
     },
     // Этот код является частью конфигурации Redux Toolkit и определяет, какой reducer должен быть вызван при 
     // срабатывании определенного action. В данном случае, при срабатывании action `getTicketsAction.pending`, 
@@ -65,13 +94,17 @@ export const ticketSlice = createSlice({
             state.isLoading = true
         })
         addCase(getTicketsAction.fulfilled, (state, action) => {
-            state.tickets = action.payload
+            let tickets = state.tickets.concat(action.payload)
+            state.tickets = tickets
             state.isLoading = false
+            state.isLoadingMore = false
+
+            state.pagination = getPagination(tickets, 5)
         })
         addCase(getTicketsAction.rejected, (state, action) => {
             state.error = "Ошибка"
             state.isLoading = false
-    
+            state.isLoadingMore = false
         })
       
     }
@@ -106,30 +139,25 @@ export const ticketSlice = createSlice({
 //     });
 // })
 
-export const getTicketsAction = createAsyncThunk(`ticket/getTicketsAction`, async () => {
-    const searchId = await getSearchId();
-    const tickets = []; // Initialize an array to store tickets
+export const getTicketsAction = createAsyncThunk(`ticket/getTicketsAction`, (_, { dispatch }) => 
+     new Promise(async (resolve, reject) => {
+        const searchId = await getSearchId();
 
-    const interval = setInterval(async () => {
-        const ticketsResponse = await getTickets(searchId);
-        if (ticketsResponse !== null && ticketsResponse.stop) {
-            clearInterval(interval);
-        } else if (ticketsResponse !== null) {
-            try{ // Only add tickets if the response is valid
-            tickets.push(...ticketsResponse.tickets); // Add new tickets to the array
-            }catch(e){
-              return tickets  
+        const interval = setInterval(async () => {
+            const ticketsResponse = await getTickets(searchId);
+
+            if (ticketsResponse != null) {
+                if (ticketsResponse.stop) {
+                    clearInterval(interval);
+        
+                    resolve(ticketsResponse.tickets);
+                } else {
+                    dispatch(ticketSlice.actions.setTickets(ticketsResponse.tickets))
+                }
             }
-        }
-    }, 200);
-
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            clearInterval(interval);
-            resolve(tickets); // Resolve with the accumulated tickets
-        }, 5000); // Set timeout to avoid infinite execution
-    });
-});
+        }, 1000);
+    })
+);
 
 // Selectors
 // Эти две функции - `stopsCountSelector` и `ticketsSelector` - являются селекторами, 
@@ -141,6 +169,8 @@ export const stopsCountSelector = (state) => state.tickets.stopsCount;
 export const ticketsSelector = (state) => state.tickets.tickets;
 export const sortedByPriceSelector = (state) => state.tickets.sortedByPrice;
 export const isLoadingSelector = (state) => state.tickets.isLoading;
+export const isLoadingMoreSelector = (state) => state.tickets.isLoadingMore;
+export const paginationSelector = (state) => state.tickets.pagination;
 
 
 // Этот код создает селектор `filteredTicketsSelector`, который принимает два аргумента: 
@@ -169,6 +199,7 @@ export const filteredTicketsSelector = createSelector(ticketsSelector, stopsCoun
 export const sortedTicketsSelector = createSelector(filteredTicketsSelector, sortedByPriceSelector, (filteredTickets, sortedByPrice) => {
     const sortedTickets = filteredTickets.map((ticket) => ({ 
         ...ticket, 
+        logo: '',
         segmentsDuration: ticket.segments?.reduce((accumulate, segment) => accumulate + segment.duration, 0) 
     }))
 // 2. Затем проверяется значение `sortedByPrice`. Если оно равно "a", 
@@ -184,4 +215,10 @@ export const sortedTicketsSelector = createSelector(filteredTicketsSelector, sor
     }
 
     return sortedTickets;
+})
+
+export const paginatedTicketsSelector = createSelector(sortedTicketsSelector, paginationSelector, (sortedTickets, { page, limit }) => {
+    const paginatedTickets = sortedTickets.slice(0, page * limit);
+
+    return paginatedTickets;
 })
