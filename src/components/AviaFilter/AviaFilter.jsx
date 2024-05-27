@@ -1,5 +1,5 @@
 import React from 'react'
-import { Checkbox } from 'antd';
+import { Checkbox, ConfigProvider } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ticketSlice } from '../../store/reducers/ticketReducer';
 import { stopsCountSelector } from '../../store/reducers/ticketReducer';
@@ -17,6 +17,19 @@ const Filter = () => {
   return (
     <div>
       <br/>
+      <ConfigProvider
+       theme={{
+        token: {
+          
+          // Alias Token
+          colorPrimary: 'white',
+          colorWhite:'#2196F3',
+        },
+      }}
+      
+      >
+
+
       <Checkbox checked={stopsCount.length === 0} 
                 onChange={() => {
         dispatch(ticketSlice.actions.resetStops())
@@ -37,6 +50,8 @@ const Filter = () => {
       <Checkbox  checked={stopsCount.length === 0 || stopsCount.includes(3)} onChange={() => {
         dispatch(ticketSlice.actions.toggleStop(3))
       }} >3 пересадки</Checkbox>
+
+      </ConfigProvider>
       <br/>
       </div> 
 
