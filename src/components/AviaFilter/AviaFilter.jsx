@@ -15,9 +15,10 @@ const Filter = () => {
   const stopsCount = useSelector(stopsCountSelector);
 
   return (
-    <div>Filter
+    <div>
       <br/>
-      <Checkbox checked={stopsCount.length === 0} onChange={() => {
+      <Checkbox checked={stopsCount.length === 0} 
+                onChange={() => {
         dispatch(ticketSlice.actions.resetStops())
       }}>Все</Checkbox>
       <br />

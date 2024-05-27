@@ -75,16 +75,15 @@ const Page = () => {
     <Layout style={layoutStyle}>
       <Header style={headerStyle}>
         <Logo style= {logoStyle}/>
-        Header</Header>
+      </Header>
       <Layout>
         <Sider width="25%" style={siderStyle}>
-          Sider
-          <AviaFilter/>
+        <AviaFilter/>
         </Sider>
-        <Content style={contentStyle}>Content
+        <Content style={contentStyle}>
           <MyTabs/>
           <AviaList/>
-          
+       
         </Content>
       </Layout>
       <Footer style={footerStyle}>Footer</Footer>

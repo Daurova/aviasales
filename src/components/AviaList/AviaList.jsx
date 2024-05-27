@@ -26,7 +26,7 @@ const AviaList = () => {
 
   return (
     <div>
-            AviaList {isLoadingMore && 'Loading more...'}
+            {isLoadingMore && 'Loading more...'}
             {/* Каждый билет передается в компонент `AviaCard` в качестве свойства `ticket`, 
             а ключ для каждого элемента уникален и создается на основе цены и перевозчика  */}
       {tickets.map(ticket => <AviaCard key={`${ticket.price}_${ticket.carrier}_${ticket.segments[0].date}`} ticket={ticket}></AviaCard>)}
