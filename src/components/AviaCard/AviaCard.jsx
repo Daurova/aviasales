@@ -1,52 +1,85 @@
-import React from 'react'
-import {Card, Col, Row, Space} from 'antd'
-import { format, formatDuration, intervalToDuration } from 'date-fns'
+import React from "react";
+import styles from "./AviaCard.module.css";
 
-const logos  ={
-  "S7": "https://pics.avs.io/99/36/S7.png",
-  "AK": "https://pics.avs.io/99/36/AK.png",
-  'BT': 'https://pics.avs.io/99/36/BT.png',
-  'DP': 'https://pics.avs.io/99/36/DP.png',
-  'FV': 'https://pics.avs.io/99/36/FV.png',
-  'U6': 'https://pics.avs.io/99/36/U6.png',
-  'UT': 'https://pics.avs.io/99/36/UT.png',
-  'W6': 'https://pics.avs.io/99/36/W6.png'
-}
+const logos = {
+  S7: "https://pics.avs.io/99/36/S7.png",
+  AK: "https://pics.avs.io/99/36/AK.png",
+  BT: "https://pics.avs.io/99/36/BT.png",
+  DP: "https://pics.avs.io/99/36/DP.png",
+  FV: "https://pics.avs.io/99/36/FV.png",
+  U6: "https://pics.avs.io/99/36/U6.png",
+  UT: "https://pics.avs.io/99/36/UT.png",
+  W6: "https://pics.avs.io/99/36/W6.png",
+};
 
 const AviaCard = ({ ticket }) => {
   return (
-    <div>
-   <Space direction="vertical" size={16}>
-    <Card
-      title={<><p><span>{ticket.price}P </span>
-      </p>
-      <img src={logos[ticket.carrier]} />
+    <div className={styles.card}>
+      <div className={styles.card__header}>
+        <span className={styles.card__header__price}>
+          {Intl.NumberFormat("ru-RU", {
+            style: "currency",
+            currency: "RUB",
+            maximumFractionDigits: 0,
+          }).format(ticket.price)}
+        </span>
+        <img
+          className={styles.card__header__logo}
+          src={logos[ticket.carrier]}
+          alt="logo"
+        />
+      </div>
+      <div className={styles.card__body}>
+        {ticket.segments.map(
+          ({ origin, destination, date, duration, stops }) => {
+            const originDate = new Date(date);
+            const destinationDate = new Date(
+              originDate.getTime() + duration * 60000
+            );
 
-      </>}
-      
-      // extra={<a href="#">More</a>}
-      style={{
-        width: 502,
-        height: 284,
-        margin:0, 
-        padding:0
-      }}
-    >
-      <p>пересадки {ticket.segments[0].stops.length}</p>
-      <p>{(ticket.segments[0].stops).map((stop)=>(stop+' '))}</p>
-      <p>{ticket.segments[0].origin}-{ticket.segments[0].destination}</p>
-      <p>время вылета{format(new Date(ticket.segments[0].date), 'HH:mm')}  время в пути {`${Math.floor(ticket.segments[0].duration / 60)}ч ${ticket.segments[0].duration% 60}м`}</p>
-      <p>пересадки {ticket.segments[1].stops.length}</p>
-      <p>{(ticket.segments[1].stops).map((stop)=>(stop+' '))}</p>
-      <p>{ticket.segments[1].origin}-{ticket.segments[1].destination}</p>
-      <p>время вылета{format(new Date(ticket.segments[1].date), 'HH:mm')}  время в пути{`${Math.floor(ticket.segments[1].duration / 60)}ч ${ticket.segments[1].duration% 60}м`}</p>
-
-        
-    </Card>
-
-  </Space>
+            return (
+              <div key={origin} className={styles.card__row}>
+                <div className={styles.card__row__item}>
+                  <span className={styles.card__row__item__title}>
+                    {origin} - {destination}
+                  </span>
+                  <span className={styles.card__row__item__text}>
+                    {originDate.toLocaleTimeString(["ru-RU"], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}{" "}
+                    -{" "}
+                    {destinationDate.toLocaleTimeString(["ru-RU"], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+                <div className={styles.card__row__item}>
+                  <span className={styles.card__row__item__title}>В ПУТИ</span>
+                  <span className={styles.card__row__item__text}>
+                    {`${Math.floor(duration / 60)}ч ${duration % 60}м`}
+                  </span>
+                </div>
+                <div className={styles.card__row__item}>
+                  {stops.length > 0 && (
+                    <>
+                      <span className={styles.card__row__item__title}>
+                        ПЕРЕСАДКИ {stops.length}
+                      </span>
+                      <span className={styles.card__row__item__text}>
+                        {stops.join(", ")}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          }
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default AviaCard
+export default AviaCard;

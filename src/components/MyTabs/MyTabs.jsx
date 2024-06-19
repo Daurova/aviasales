@@ -1,25 +1,39 @@
-import React from 'react'
-import {useSelector, useDispatch} from 'react-redux'
-import { ticketSlice, sortedByPriceSelector } from '../../store/reducers/ticketReducer';
-import { Tabs, Flex, Radio } from 'antd';
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  ticketSlice,
+  sortedByPriceSelector,
+} from "../../store/reducers/ticketReducer";
+import { Tabs, Flex, Radio } from "antd";
+
+import styles from "./MyTabs.module.css";
 
 const MyTabs = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const sortedByPrice = useSelector(sortedByPriceSelector)
+  const sortedByPrice = useSelector(sortedByPriceSelector);
 
   const onChange = (e) => {
-    dispatch(ticketSlice.actions.toggleSortedByPrice(e.target.value))
+    dispatch(ticketSlice.actions.toggleSortedByPrice(e.target.value));
   };
 
   return (
-    <div>
-        <Radio.Group onChange={onChange} value={sortedByPrice} buttonStyle='solid'>
-        <Radio.Button value="a">Самый дешевый</Radio.Button>
-        <Radio.Button value="b">Самый быстрый</Radio.Button>
+    <div className={styles.tabs}>
+      <Radio.Group
+        onChange={onChange}
+        value={sortedByPrice}
+        buttonStyle="solid"
+        className={styles.tabs_group}
+      >
+        <Radio.Button className={styles.tab} value="a">
+          Самый дешевый
+        </Radio.Button>
+        <Radio.Button className={styles.tab} value="b">
+          Самый быстрый
+        </Radio.Button>
       </Radio.Group>
-      </div>
-  )
-}
+    </div>
+  );
+};
 
-export default MyTabs
+export default MyTabs;
